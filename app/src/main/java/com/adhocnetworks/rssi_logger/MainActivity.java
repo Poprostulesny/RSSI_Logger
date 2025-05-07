@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int WRITE_PERMISSION = 101;
     private final ArrayList<Integer> RSSI_list = new ArrayList<Integer>(); // Keeps track of the RSSI values
     // Measurement period in milliseconds
-    private final int measurePeriod = 500;
+    private final int measurePeriod = 10;
     // Preview period in milliseconds
     private final int previewPeriod = 250;
     private final Handler handler = new Handler();    // Handler and runnable to create recurring measuring
@@ -102,10 +102,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int newRSSI = getWiFiRSSI();
 
             this.addRSSIMeasurement(newRSSI);
-
+            if(numSamples==100){
+                Log.d("Runnable", "Runnable stopped");
+                buttonStart.setText("Start Measuring");
+                handler.removeCallbacks(rssiRunnable);
+                buttonSave.setEnabled(true);
+                buttonClear.setEnabled(true);
+                measureIsOn = false;
+                return;
+            }
             handler.postDelayed(rssiRunnable, measurePeriod);
 
-            Log.d("Runnable", "RSSI measured: " + newRSSI);
+            //Log.d("Runnable", "RSSI measured: " + newRSSI);
         };
 
         rssiPreviewRunnable = () -> {
